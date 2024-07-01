@@ -11,6 +11,8 @@ services:
       - DASHBOARD_ROOT_PASSWORD=testing
       - BASE_NAME=base
       - BASE_CHAIN_ID=8453
+      - BASE_BLOCK_START=16364174
+      - BASE_BLOCK_STOP=16365417
     env_file:
       - .env
     depends_on:
