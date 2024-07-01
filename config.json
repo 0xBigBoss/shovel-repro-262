@@ -1,0 +1,669 @@
+{
+  "dashboard": {
+    "root_password": "testing"
+  },
+  "pg_url": "$DATABASE_URL",
+  "eth_sources": [
+    {
+      "name": "base_block_headers",
+      "url": "$BASE_RPC_URL",
+      "chain_id": "$BASE_CHAIN_ID",
+      "batch_size": 100,
+      "concurrency": 1
+    },
+    {
+      "name": "base_logs",
+      "url": "$BASE_RPC_URL",
+      "chain_id": "$BASE_CHAIN_ID",
+      "batch_size": 100,
+      "concurrency": 2
+    }
+  ],
+  "integrations": [
+    {
+      "name": "send_account_created",
+      "enabled": true,
+      "block": [
+        {
+          "name": "chain_id",
+          "column": "chain_id"
+        },
+        {
+          "name": "block_time",
+          "column": "block_time"
+        },
+        {
+          "name": "tx_hash",
+          "column": "tx_hash"
+        },
+        {
+          "name": "log_addr",
+          "column": "log_addr",
+          "filter_op": "contains",
+          "filter_arg": [
+            "0x008c9561857b6555584d20aC55110335759Aa2c2",
+            "0x1E6a7C7aA90Ea75d9aD9e02AEA71e3acbe05F8F5",
+            "0xe4C5EF95e8cDA5DB09393a08E30645F883e187B8"
+          ]
+        }
+      ],
+      "event": {
+        "type": "event",
+        "anonymous": false,
+        "inputs": [
+          {
+            "name": "account",
+            "type": "address",
+            "indexed": true,
+            "column": "account"
+          }
+        ],
+        "name": "AccountCreated"
+      },
+      "table": {
+        "name": "send_account_created",
+        "columns": [
+          {
+            "name": "chain_id",
+            "type": "numeric"
+          },
+          {
+            "name": "log_addr",
+            "type": "bytea"
+          },
+          {
+            "name": "block_time",
+            "type": "numeric"
+          },
+          {
+            "name": "user_op_hash",
+            "type": "bytea"
+          },
+          {
+            "name": "tx_hash",
+            "type": "bytea"
+          },
+          {
+            "name": "account",
+            "type": "bytea"
+          }
+        ]
+      },
+      "sources": [
+        {
+          "name": "base_logs",
+          "start": "$BASE_BLOCK_START",
+          "stop": "$BASE_BLOCK_STOP"
+        }
+      ]
+    },
+    {
+      "name": "send_account_transfers",
+      "enabled": true,
+      "table": {
+        "name": "send_account_transfers",
+        "columns": [
+          {
+            "name": "chain_id",
+            "type": "numeric"
+          },
+          {
+            "name": "log_addr",
+            "type": "bytea"
+          },
+          {
+            "name": "block_time",
+            "type": "numeric"
+          },
+          {
+            "name": "tx_hash",
+            "type": "bytea"
+          },
+          {
+            "name": "f",
+            "type": "bytea"
+          },
+          {
+            "name": "t",
+            "type": "bytea"
+          },
+          {
+            "name": "v",
+            "type": "numeric"
+          }
+        ]
+      },
+      "block": [
+        {
+          "name": "chain_id",
+          "column": "chain_id"
+        },
+        {
+          "name": "block_time",
+          "column": "block_time"
+        },
+        {
+          "name": "tx_hash",
+          "column": "tx_hash"
+        },
+        {
+          "name": "log_addr",
+          "column": "log_addr"
+        }
+      ],
+      "event": {
+        "type": "event",
+        "name": "Transfer",
+        "anonymous": false,
+        "inputs": [
+          {
+            "indexed": true,
+            "name": "from",
+            "type": "address",
+            "column": "f",
+            "filter_op": "contains",
+            "filter_ref": {
+              "integration": "send_account_created",
+              "column": "account"
+            }
+          },
+          {
+            "indexed": true,
+            "name": "to",
+            "type": "address",
+            "column": "t",
+            "filter_op": "contains",
+            "filter_ref": {
+              "integration": "send_account_created",
+              "column": "account"
+            }
+          },
+          {
+            "indexed": false,
+            "name": "value",
+            "type": "uint256",
+            "column": "v"
+          }
+        ]
+      },
+      "sources": [
+        {
+          "name": "base_logs",
+          "start": "$BASE_BLOCK_START",
+          "stop": "$BASE_BLOCK_STOP"
+        }
+      ]
+    },
+    {
+      "name": "send_token_transfers",
+      "enabled": true,
+      "table": {
+        "name": "send_token_transfers",
+        "columns": [
+          {
+            "name": "chain_id",
+            "type": "numeric"
+          },
+          {
+            "name": "log_addr",
+            "type": "bytea"
+          },
+          {
+            "name": "block_time",
+            "type": "numeric"
+          },
+          {
+            "name": "tx_hash",
+            "type": "bytea"
+          },
+          {
+            "name": "f",
+            "type": "bytea"
+          },
+          {
+            "name": "t",
+            "type": "bytea"
+          },
+          {
+            "name": "v",
+            "type": "numeric"
+          }
+        ]
+      },
+      "block": [
+        {
+          "name": "chain_id",
+          "column": "chain_id"
+        },
+        {
+          "name": "block_time",
+          "column": "block_time"
+        },
+        {
+          "name": "tx_hash",
+          "column": "tx_hash"
+        },
+        {
+          "name": "log_addr",
+          "column": "log_addr",
+          "filter_op": "contains",
+          "filter_arg": [
+            "0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A",
+            "0x7cEfbe54c37a35dCdaD29b86373ca8353a2F4680"
+          ]
+        }
+      ],
+      "event": {
+        "type": "event",
+        "name": "Transfer",
+        "anonymous": false,
+        "inputs": [
+          {
+            "indexed": true,
+            "name": "from",
+            "type": "address",
+            "column": "f"
+          },
+          {
+            "indexed": true,
+            "name": "to",
+            "type": "address",
+            "column": "t"
+          },
+          {
+            "indexed": false,
+            "name": "value",
+            "type": "uint256",
+            "column": "v"
+          }
+        ]
+      },
+      "sources": [
+        {
+          "name": "base_logs",
+          "start": "$BASE_BLOCK_START",
+          "stop": "$BASE_BLOCK_STOP"
+        }
+      ]
+    },
+    {
+      "name": "send_revenues_safe_receives",
+      "enabled": true,
+      "table": {
+        "name": "send_revenues_safe_receives",
+        "columns": [
+          {
+            "name": "chain_id",
+            "type": "numeric"
+          },
+          {
+            "name": "log_addr",
+            "type": "bytea"
+          },
+          {
+            "name": "block_time",
+            "type": "numeric"
+          },
+          {
+            "name": "tx_hash",
+            "type": "bytea"
+          },
+          {
+            "name": "sender",
+            "type": "bytea"
+          },
+          {
+            "name": "v",
+            "type": "numeric"
+          }
+        ]
+      },
+      "block": [
+        {
+          "name": "chain_id",
+          "column": "chain_id"
+        },
+        {
+          "name": "block_time",
+          "column": "block_time"
+        },
+        {
+          "name": "tx_hash",
+          "column": "tx_hash"
+        },
+        {
+          "name": "log_addr",
+          "column": "log_addr",
+          "filter_op": "contains",
+          "filter_arg": [
+            "0x269cD0a2afd1BAbdA7A74ab1dC853869a37aa4a7",
+            "0x71fa02bb11e4b119bEDbeeD2f119F62048245301"
+          ]
+        }
+      ],
+      "event": {
+        "type": "event",
+        "name": "SafeReceived",
+        "inputs": [
+          {
+            "name": "sender",
+            "internalType": "address",
+            "type": "address",
+            "indexed": true,
+            "column": "sender"
+          },
+          {
+            "name": "value",
+            "type": "uint256",
+            "indexed": false,
+            "column": "v"
+          }
+        ]
+      },
+      "sources": [
+        {
+          "name": "base_logs",
+          "start": "$BASE_BLOCK_START",
+          "stop": "$BASE_BLOCK_STOP"
+        }
+      ]
+    },
+    {
+      "name": "send_account_signing_key_added",
+      "enabled": true,
+      "block": [
+        {
+          "name": "chain_id",
+          "column": "chain_id"
+        },
+        {
+          "name": "block_time",
+          "column": "block_time"
+        },
+        {
+          "name": "tx_hash",
+          "column": "tx_hash"
+        },
+        {
+          "name": "log_addr",
+          "column": "log_addr",
+          "filter_op": "contains",
+          "filter_ref": {
+            "integration": "send_account_created",
+            "column": "account"
+          }
+        }
+      ],
+      "event": {
+        "type": "event",
+        "anonymous": false,
+        "inputs": [
+          {
+            "name": "account",
+            "type": "address",
+            "indexed": true,
+            "column": "account"
+          },
+          {
+            "name": "keySlot",
+            "type": "uint8",
+            "indexed": false,
+            "column": "key_slot"
+          },
+          {
+            "name": "key",
+            "type": "bytes32[2]",
+            "indexed": false,
+            "column": "key"
+          }
+        ],
+        "name": "SigningKeyAdded"
+      },
+      "table": {
+        "name": "send_account_signing_key_added",
+        "columns": [
+          {
+            "name": "chain_id",
+            "type": "numeric"
+          },
+          {
+            "name": "log_addr",
+            "type": "bytea"
+          },
+          {
+            "name": "block_time",
+            "type": "numeric"
+          },
+          {
+            "name": "tx_hash",
+            "type": "bytea"
+          },
+          {
+            "name": "account",
+            "type": "bytea"
+          },
+          {
+            "name": "key_slot",
+            "type": "smallint"
+          },
+          {
+            "name": "key",
+            "type": "bytea"
+          }
+        ]
+      },
+      "sources": [
+        {
+          "name": "base_logs",
+          "start": "$BASE_BLOCK_START",
+          "stop": "$BASE_BLOCK_STOP"
+        }
+      ]
+    },
+    {
+      "name": "send_account_signing_key_removed",
+      "enabled": true,
+      "block": [
+        {
+          "name": "chain_id",
+          "column": "chain_id"
+        },
+        {
+          "name": "block_time",
+          "column": "block_time"
+        },
+        {
+          "name": "tx_hash",
+          "column": "tx_hash"
+        },
+        {
+          "name": "log_addr",
+          "column": "log_addr",
+          "filter_op": "contains",
+          "filter_ref": {
+            "integration": "send_account_created",
+            "column": "account"
+          }
+        }
+      ],
+      "event": {
+        "type": "event",
+        "anonymous": false,
+        "inputs": [
+          {
+            "name": "account",
+            "type": "address",
+            "indexed": true,
+            "column": "account"
+          },
+          {
+            "name": "keySlot",
+            "type": "uint8",
+            "indexed": false,
+            "column": "key_slot"
+          },
+          {
+            "name": "key",
+            "type": "bytes32[2]",
+            "indexed": false,
+            "column": "key"
+          }
+        ],
+        "name": "SigningKeyRemoved"
+      },
+      "table": {
+        "name": "send_account_signing_key_removed",
+        "columns": [
+          {
+            "name": "chain_id",
+            "type": "numeric"
+          },
+          {
+            "name": "log_addr",
+            "type": "bytea"
+          },
+          {
+            "name": "block_time",
+            "type": "numeric"
+          },
+          {
+            "name": "tx_hash",
+            "type": "bytea"
+          },
+          {
+            "name": "account",
+            "type": "bytea"
+          },
+          {
+            "name": "key_slot",
+            "type": "smallint"
+          },
+          {
+            "name": "key",
+            "type": "bytea"
+          }
+        ]
+      },
+      "sources": [
+        {
+          "name": "base_logs",
+          "start": "$BASE_BLOCK_START",
+          "stop": "$BASE_BLOCK_STOP"
+        }
+      ]
+    },
+    {
+      "name": "send_account_receives",
+      "enabled": true,
+      "block": [
+        {
+          "name": "chain_id",
+          "column": "chain_id"
+        },
+        {
+          "name": "block_num",
+          "column": "block_num"
+        },
+        {
+          "name": "block_time",
+          "column": "block_time"
+        },
+        {
+          "name": "tx_hash",
+          "column": "tx_hash"
+        },
+        {
+          "name": "tx_idx",
+          "column": "tx_idx"
+        },
+        {
+          "name": "log_idx",
+          "column": "log_idx"
+        },
+        {
+          "name": "log_addr",
+          "column": "log_addr",
+          "filter_op": "contains",
+          "filter_ref": {
+            "integration": "send_account_created",
+            "column": "account"
+          }
+        }
+      ],
+      "table": {
+        "name": "send_account_receives",
+        "columns": [
+          {
+            "name": "chain_id",
+            "type": "numeric"
+          },
+          {
+            "name": "block_num",
+            "type": "numeric"
+          },
+          {
+            "name": "block_time",
+            "type": "numeric"
+          },
+          {
+            "name": "tx_hash",
+            "type": "bytea"
+          },
+          {
+            "name": "tx_idx",
+            "type": "numeric"
+          },
+          {
+            "name": "log_idx",
+            "type": "numeric"
+          },
+          {
+            "name": "log_addr",
+            "type": "bytea"
+          },
+          {
+            "name": "sender",
+            "type": "bytea"
+          },
+          {
+            "name": "value",
+            "type": "numeric"
+          }
+        ]
+      },
+      "event": {
+        "type": "event",
+        "anonymous": false,
+        "inputs": [
+          {
+            "column": "sender",
+            "name": "sender",
+            "internalType": "address",
+            "type": "address",
+            "indexed": true,
+            "filter_op": "contains",
+            "filter_ref": {
+              "integration": "send_account_created",
+              "column": "account"
+            }
+          },
+          {
+            "column": "value",
+            "name": "value",
+            "internalType": "uint256",
+            "type": "uint256",
+            "indexed": false
+          }
+        ],
+        "name": "Received"
+      },
+      "sources": [
+        {
+          "name": "base_logs",
+          "start": "$BASE_BLOCK_START",
+          "stop": "$BASE_BLOCK_STOP"
+        }
+      ]
+    }
+  ]
+}

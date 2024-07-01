@@ -1,0 +1,35 @@
+services:
+  shovel:
+    image: indexsupply/shovel:2096
+    command: shovel -config /shovel/config.json
+    volumes:
+      - ./config.json:/shovel/config.json
+    ports:
+      - 8546:8546
+    environment:
+      - DATABASE_URL=postgresql://postgres:postgres@postgres:5432/postgres
+      - DASHBOARD_ROOT_PASSWORD=testing
+      - BASE_NAME=base
+      - BASE_CHAIN_ID=8453
+    env_file:
+      - .env
+    depends_on:
+      postgres:
+        condition: service_healthy
+  postgres:
+    image: postgres:15
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=postgres
+    ports:
+      - 5432:5432
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+networks:
+  default:
+    name: shovel-network
